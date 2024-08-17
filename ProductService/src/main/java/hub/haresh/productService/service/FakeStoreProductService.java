@@ -9,7 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class FakeStoreProductService implements ProductService {
@@ -29,5 +32,14 @@ public class FakeStoreProductService implements ProductService {
 
         ResponseEntity<FakeStoreProductDTO> fakeStoreProductDTO = restTemplate.getForEntity(Constants.FAKE_STORE_URL + "/products/{id}", FakeStoreProductDTO.class, id);
         return Objects.requireNonNull(fakeStoreProductDTO.getBody()).convertToProductDTO();
+    }
+
+    @Override
+    public List<ProductDTO> getAllProducts() {
+        ResponseEntity<FakeStoreProductDTO[]> fakeStoreProductDTOs = restTemplate.getForEntity(Constants.FAKE_STORE_URL + "/products", FakeStoreProductDTO[].class);
+
+        return Arrays.stream(Objects.requireNonNull(fakeStoreProductDTOs.getBody()))
+                .map(FakeStoreProductDTO::convertToProductDTO)
+                .collect(Collectors.toList());
     }
 }
